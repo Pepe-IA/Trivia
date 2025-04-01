@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia Educativa</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px gray;
+            width: 50%;
+            margin: auto;
+        }
+        h1 {
+            color: #333;
+        }
+        .question {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .options button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .options button:hover {
+            background-color: #ddd;
+        }
+        .correct {
+            background-color: #4CAF50 !important;
+            color: white;
+        }
+        .incorrect {
+            background-color: #FF5733 !important;
+            color: white;
+        }
+        #next {
+            display: none;
+            background-color: #007BFF;
+            color: white;
+            padding: 10px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        #next:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #result {
+            display: none;
+            font-size: 22px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container animate__animated animate__fadeIn">
+        <h1>Trivia de Conocimientos Generales</h1>
+        <div id="quiz">
+            <div id="question-container">
+                <p class="question" id="question-text"></p>
+                <div class="options" id="options-container"></div>
+            </div>
+            <button id="next" onclick="nextQuestion()">Siguiente</button>
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const questions = [
+            { question: "¿Cuál es el río más largo del mundo?", options: ["Amazonas", "Nilo", "Yangtsé"], correct: 0 },
+            { question: "¿Cuántos planetas hay en el sistema solar?", options: ["8", "9", "7"], correct: 0 },
+            { question: "¿Quién pintó la Mona Lisa?", options: ["Van Gogh", "Picasso", "Leonardo da Vinci"], correct: 2 },
+            { question: "¿Cuál es la capital de Japón?", options: ["Pekín", "Tokio", "Seúl"], correct: 1 },
+            { question: "¿Cuánto es 7x8?", options: ["48", "56", "64"], correct: 1 },
+            { question: "¿Quién escribió 'Cien años de soledad'?", options: ["Mario Vargas Llosa", "Gabriel García Márquez", "Pablo Neruda"], correct: 1 },
+            { question: "¿Cuál es el metal más caro del mundo?", options: ["Oro", "Rodio", "Platino"], correct: 1 },
+            { question: "¿Qué gas es esencial para la respiración humana?", options: ["Oxígeno", "Nitrógeno", "Dióxido de carbono"], correct: 0 },
+            { question: "¿En qué continente se encuentra Egipto?", options: ["África", "Asia", "Europa"], correct: 0 },
+            { question: "¿Cuál es el océano más grande?", options: ["Atlántico", "Índico", "Pacífico"], correct: 2 }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selected = false;
+
+        function loadQuestion() {
+            selected = false;
+            document.getElementById("next").style.display = "none";
+            const q = questions[currentQuestion];
+            document.getElementById("question-text").textContent = q.question;
+            const optionsContainer = document.getElementById("options-container");
+            optionsContainer.innerHTML = "";
+            
+            q.options.forEach((option, index) => {
+                const button = document.createElement("button");
+                button.textContent = option;
+                button.onclick = () => selectAnswer(index, q.correct, button);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function selectAnswer(index, correctIndex, button) {
+            if (selected) return;
+            selected = true;
+            const buttons = document.querySelectorAll(".options button");
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (index === correctIndex) {
+                button.classList.add("correct");
+                score++;
+            } else {
+                button.classList.add("incorrect");
+                buttons[correctIndex].classList.add("correct");
+            }
+
+            document.getElementById("next").style.display = "block";
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById("quiz").style.display = "none";
+            const resultContainer = document.getElementById("result");
+            resultContainer.style.display = "block";
+            let feedback = "";
+
+            if (score === 10) {
+                feedback = "¡Excelente! Eres un genio del conocimiento 🎓";
+            } else if (score >= 7) {
+                feedback = "¡Muy bien! Tienes un gran nivel de conocimientos 👏";
+            } else if (score >= 4) {
+                feedback = "Bien, pero puedes mejorar. Sigue aprendiendo 📖";
+            } else {
+                feedback = "Sigue practicando, ¡nunca dejes de aprender! 💡";
+            }
+
+            resultContainer.innerHTML = `Puntaje: ${score}/10 <br><br> ${feedback}`;
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
